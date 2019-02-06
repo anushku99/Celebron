@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.support.v7.widget.Toolbar;
 import xyz.itechsyst.celebron.AccountActivity.LoginActivity;
 import xyz.itechsyst.celebron.AccountActivity.SignupActivity;
 import xyz.itechsyst.celebron.R;
@@ -23,9 +23,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Toolbar toolbar;
+
     private Button btnChangePassword, btnRemoveUser,
-            changePassword, remove, signOut;
-    private TextView email;
+            changePassword, remove, signOut,btnviewuserprofile;
 
     private EditText oldEmail, password, newPassword;
     private ProgressBar progressBar;
@@ -36,13 +37,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//get firebase auth instance
-        auth = FirebaseAuth.getInstance();
-        email = (TextView) findViewById(R.id.useremail);
 
+        toolbar=(Toolbar) findViewById(R.id.action_toolbar);
+        btnviewuserprofile=(Button) findViewById(R.id.view_user_profile_button);
+        btnChangePassword = (Button) findViewById(R.id.change_password_button);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        btnRemoveUser = (Button) findViewById(R.id.remove_user_button);
+        changePassword = (Button) findViewById(R.id.changePass);
+        remove = (Button) findViewById(R.id.remove);
+        signOut = (Button) findViewById(R.id.sign_out);
+        oldEmail = (EditText) findViewById(R.id.old_email);
+        password = (EditText) findViewById(R.id.password);
+        newPassword = (EditText) findViewById(R.id.newPassword);
+
+        //action bar
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
+        toolbar.setTitleTextAppearance(this,R.style.TextApperance_TabsFont);
+
+        //get firebase auth instance
+        auth = FirebaseAuth.getInstance();
         //get current user
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        setDataToView(user);
+
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -58,35 +76,23 @@ public class MainActivity extends AppCompatActivity {
         };
 
 
-        btnChangePassword = (Button) findViewById(R.id.change_password_button);
-
-        btnRemoveUser = (Button) findViewById(R.id.remove_user_button);
-
-        changePassword = (Button) findViewById(R.id.changePass);
-
-        remove = (Button) findViewById(R.id.remove);
-        signOut = (Button) findViewById(R.id.sign_out);
-
-        oldEmail = (EditText) findViewById(R.id.old_email);
-
-        password = (EditText) findViewById(R.id.password);
-        newPassword = (EditText) findViewById(R.id.newPassword);
-
         oldEmail.setVisibility(View.GONE);
-
         password.setVisibility(View.GONE);
         newPassword.setVisibility(View.GONE);
-
         changePassword.setVisibility(View.GONE);
-
         remove.setVisibility(View.GONE);
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
 
+        btnviewuserprofile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ViewUserProfileActivity.class));
+            }
+        });
 
         btnChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
                 changePassword.setVisibility(View.VISIBLE);
 
-                remove.setVisibility(View.GONE);
+                remove.setVisibility(View.VISIBLE);
             }
         });
 
@@ -167,13 +173,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @SuppressLint("SetTextI18n")
-    private void setDataToView(FirebaseUser user) {
-
-        email.setText("User Email: " + user.getEmail());
-
-
-    }
 
     // this listener will be called when there is change in firebase user session
     FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
@@ -186,9 +185,6 @@ public class MainActivity extends AppCompatActivity {
                 // launch login activity
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
-            } else {
-                setDataToView(user);
-
             }
         }
 
